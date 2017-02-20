@@ -1,7 +1,7 @@
 #include <cassert>
 
+
 #include <iterator>
-#include <random>
 #include <utility>
 #include <vector>
 
@@ -86,7 +86,7 @@ template < class InputIt, class UnaryPredicate>
     }
     
     template <class InputIt1, class InputIt2> 
-        bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2) {
+    bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2) {
         for (; first1 != last1, first2 != first2 + (last1 - first1); ++first1, ++first2) {
             if( *first1 != *first2)
                 return false;
@@ -95,16 +95,205 @@ template < class InputIt, class UnaryPredicate>
     }
     
     template <class InputIt1, class InputIt2, class BinaryPredicate>
-        bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPredicate P) {
+    bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPredicate P) {
         for (; first1 != last1, first2 != first2 + (last1 - first1); ++first1, ++first2) {
             if( !p(*first1, *first2))
                 return false;
         }
         return true;
+    }
+    
+    template <class InputIt, class T>
+    InputIt find (InputIt first, InputIt last, const T& value){
+        for(; first != last; ++first){
+            if (*first == value)
+                return first;
+        }
+        return last;
+    }
+    
+    template <class InputIt, class UnaryPredicate>
+    InputIt find_if( InputIt first, InputIt last, UnaryPredicate p) {
+        for (; first != last; ++first){
+            if (p(*first))
+                return first;
+        }
+        return last;
+    }
+    
+    template <class InputIt, class UnaryPredicate>
+    InputIt find_if_not ( InputIt first, InputIt last, UnaryPredicate q) {
+       for (; first != last; ++first){
+           if (!q(*first)){
+               return first;
+           }
+       }
+        return last;
+    }
+    
+    template <class ForwardIt1, class ForwardIt2>
+    ForwardIt1 search( ForwardIt1 first, ForwardIt1 last, 
+                      ForwardIt2 s_first, ForwardIt2 s_last){
+        for(; first != last; ++first){
+            ForwardIt1 temp1 = first;
+            ForwardIt2 temp2 = s_first;
+            while(temp1 != last && temp2 != s_last && *temp1 == *temp2) {
+                ++temp1;
+                ++temp2;
+            }
+            if (temp2 == s_last)
+                return first;
+        }
+        return last;
         
     }
     
+    template <class ForwardIt1, class ForwardIt2, class BinaryPredicate>
+    ForwardIt1 search (ForwardIt1 first, ForwardIt1 last,
+                      ForwardIt2 s_first, ForwardIt2 s_last, BinaryPredicate p) {
+        for(; first != last; ++first){
+            ForwardIt1 temp1 = first;
+            ForwardIt2 temp2 = s_first;
+            while(temp1 != last && temp2 != s_last && p(*temp1, *temp2)){
+                ++temp1;
+                ++temp2;
+            }
+            if (temp2 == s_last)
+                return first;
+        }
+        return last;
+    }
+    
+    template <class ForwardIt1, class ForwardIt2>
+    ForwardIt1 find_end (ForwardIt1 first, ForwardIt1 last, 
+                         ForwardIt2 s_first, ForwardIt2 s_last) {
+        if (s_first == s_last)
+            return last;
+        ForwardIt1 res = last;
+        for (; ; ++first) {
+            ForwardIt1 temp = search(first, last, s_first, s_last);
+            if (temp == last) {
+                return res;
+            } else { 
+                res = temp; 
+                first = temp; 
+            }
+        }
+        return res;
+    }
+    
+    template <class ForwardIt1, class ForwardIt2, class BinaryPredicate>
+    ForwardIt1 find_end (ForwardIt1 first, ForwardIt1 last, 
+                        ForwardIt2 s_first, ForwardIt2 s_last, BinaryPredicate p) {
+        if (s_first == s_last)
+            return last;
+        ForwardIt1 res = last;
+        for (;; ++first) {
+            ForwardIt1 temp = search(first, last, s_first, s_last, p);
+            if (temp == last){
+                return res;
+            } else {
+                res = temp;
+                first = temp;
+            }
+        }
+        return res;
+    }
+    
+    template <class InputIt, class ForwardIt>
+    InputIt find_first_of ( InputIt first, InputIt last,
+                          ForwardIt s_first, ForwardIt s_last) {
+        if (s_first == s_last){
+            return last;
+        }
+        for(; first != last; ++first){
+            for(; s_first != s_last; ++s_first){
+                if( *first == *s_first){
+                    return first;
+                }
+            }
+        }
+        return last;
+    }
+    
+    template <class InputIt, class ForwardIt, class BinaryPredicate>
+    InputIt find_first_of(InputIt first, InputIt last,
+                         ForwardIt s_first, ForwardIt s_last, BinaryPredicate p){
+        if (s_first == s_last){
+            return last;
+        }
+        for(; first != last; ++first){
+            for(; s_first != s_last; ++s_first){
+                if(p(*first, *s_first)){
+                    return first;
+                }
+            }
+        }
+        return last;
+    }
+    
+    template <class ForwardIt>
+    ForwardIt adjacent_find ( ForwardIt first, ForwardIt last) {
+        if (first == last)
+            return last;
+        for(; first != last; ++first){
+            ForwardIt temp = first;
+            if (*temp == *(++temp))
+                return first;
+        }
+        return last;
+    }
+    
+    template <class ForwardIt, class BinaryPredicate>
+    ForwardIt adjacent_find ( ForwardIt first, ForwardIt last,
+                             BinaryPredicate p){
+        if (first == last)
+            return last;
+        for(; first != last; ++first) {
+            ForwardIt temp = first;
+            if (p(*temp, *(++temp)))
+                return first;
+        }
+        return last;
+    }
+    
+    template <class ForwardIt, class Size, class T>
+    ForwardIt search_n( ForwardIt first, ForwardIt last, Size count, const T& value) {
+        if (first == last)
+            return last;
+        for (; first != last; ++first) {
+            ForwardIt temp = first;
+            Size tempCount = 0;
+            while( temp != last && *temp == value && tempCount != count){
+                ++tempCount;
+                ++temp;
+            }
+            if( tempCount == count)
+                return first;
+        }
+        return last;
+    }
+    
+    template <class ForwardIt, class Size, class T, class BinaryPredicate>
+    ForwardIt search_n (ForwardIt first, ForwardIt last, 
+                        Size count, const T& value, BinaryPredicate v) {
+        if (first == last)
+            return last;
+        for (; first != last; ++first){
+            ForwardIt temp = first;
+            Size tempCount = 0;
+            while (temp != last && p(*first, value) && tempCount != count){//*first?
+                ++temp;
+                ++tempCount;
+            }
+            if(tempCount == count)
+                return first;
+        }
+        return last;
+    }
+    
 } // namespace F
+
 
 
 
@@ -140,7 +329,7 @@ ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
     for (; first1 != last1; ++first1) {
         auto current1 = first1;
         auto current2 = first2;
-        while (current1 != last1 && current2!=last2 && *current1 == * current2) {
+        while (current1 != last1 && current2 != last2 && *current1 == *current2) {
             ++current1;
             ++current2;
         }
@@ -150,7 +339,7 @@ ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
     }
     return last1;
 }
-    
+
 template <class ForwardIterator1, class ForwardIterator2, class UnaryPredicate>
 ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
                         ForwardIterator2 first2, ForwardIterator2 last2,
@@ -158,11 +347,10 @@ ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
     for (; first1 != last1; ++first1) {
         auto current1 = first1;
         auto current2 = first2;
-        while (current1 != last1 && current2!=last2 && p(*current1, *current2)) {
+        while (current1 != last1 && current2 != last2 && p(*current1, *current2)) {
             ++current1;
             ++current2;
         }
-        
         if (current2 == last2)
             return first1;
     }
@@ -259,34 +447,34 @@ namespace test {
         auto binary_predicate = [](int x, int y){return x==y;};
         
         { // middle
-            auto result = search_n(vtr.cbegin(), vtr.cend(), 3, 6);
+            auto result = X::search_n(vtr.cbegin(), vtr.cend(), 3, 6);
             assert(result == vtr.cbegin() + 6);
             
-            result = search_n(vtr.cbegin(), vtr.cend(), 3, 6, binary_predicate);
+            result = X::search_n(vtr.cbegin(), vtr.cend(), 3, 6, binary_predicate);
             assert(result == vtr.cbegin() + 6);
         }
         
         { // begin
-            auto result = search_n(vtr.cbegin(), vtr.cend(), 2, 1);
+            auto result = X::search_n(vtr.cbegin(), vtr.cend(), 2, 1);
             assert(result == vtr.cbegin());
         }
         
         { // end
-            auto result = search_n(vtr.cbegin(), vtr.cend(), 2, 8);
+            auto result = X::search_n(vtr.cbegin(), vtr.cend(), 2, 8);
             assert(result == vtr.cend() - 2);
         }
         
         { // non existe
-            auto result = search_n(vtr.cbegin(), vtr.cend(), 3, 8);
+            auto result = X::search_n(vtr.cbegin(), vtr.cend(), 3, 8);
             assert(result == vtr.cend());
             
-            result = search_n(vtr.cbegin(), vtr.cend(), 4, 6);
+            result = X::search_n(vtr.cbegin(), vtr.cend(), 4, 6);
             assert(result == vtr.cend());
         }
         
         { // empty container
             std::vector<int> vtr;
-            auto result = search_n(vtr.cbegin(), vtr.cend(), 1, 1);
+            auto result = X::search_n(vtr.cbegin(), vtr.cend(), 1, 1);
             assert(result == vtr.cend());
         }
     }
@@ -297,28 +485,28 @@ namespace test {
         
         { // middle
             std::vector<int> vtr2{2, 3, 4};
-            auto result = search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
+            auto result = X::search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
             assert(result == vtr.cbegin() + 3);
             
-            result = search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend(), binary_predicate);
+            result = X::search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend(), binary_predicate);
             assert(result == vtr.cbegin() + 3);
         }
         
         { // begin
             std::vector<int> vtr2{1, 2, 3};
-            auto result = search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
+            auto result = X::search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
             assert(result == vtr.cbegin());
         }
         
         { // end
             std::vector<int> vtr2{2, 3, 4, 5};
-            auto result = search(vtr.begin(), vtr.end(), vtr2.begin(), vtr2.end());
+            auto result = X::search(vtr.begin(), vtr.end(), vtr2.begin(), vtr2.end());
             assert(result == vtr.cbegin() + 3);
         }
         
         { // non existe
             std::vector<int> vtr2{1, 1};
-            auto result = search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
+            auto result = X::search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
             assert(result == vtr.cend());
         }
         
@@ -326,13 +514,13 @@ namespace test {
             std::vector<int> vtr2{};
             std::vector<int> vtr3{};
             
-            auto result = search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
+            auto result = X::search(vtr.cbegin(), vtr.cend(), vtr2.cbegin(), vtr2.cend());
             assert(result == vtr.cend());
             
-            result = search(vtr2.cbegin(), vtr2.cend(), vtr3.cbegin(), vtr3.cend());
+            result = X::search(vtr2.cbegin(), vtr2.cend(), vtr3.cbegin(), vtr3.cend());
             assert(result == vtr2.cend());
             
-            result = search(vtr2.cbegin(), vtr2.cend(), vtr2.cbegin(), vtr2.cend());
+            result = X::search(vtr2.cbegin(), vtr2.cend(), vtr2.cbegin(), vtr2.cend());
             assert(result == vtr2.cend());
         }
     }
@@ -385,9 +573,6 @@ namespace test {
     
 }
 
-
-
-
 int main() {
     test::test_all_of();
     test::test_none_of();
@@ -396,42 +581,3 @@ int main() {
     test::test_search_n();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
