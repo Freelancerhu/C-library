@@ -1,11 +1,13 @@
 #include <cassert>
 
-
+#include <iostream>
 #include <iterator>
 #include <utility>
 #include <vector>
+#include <string>
 
 namespace F{
+//Non-modifying sequence operations
 template < class InputIt, class UnaryPredicate>
     bool all_of( InputIt first, InputIt last, UnaryPredicate p){
         for(; first != last; ++first){
@@ -292,7 +294,153 @@ template < class InputIt, class UnaryPredicate>
         return last;
     }
     
+    
+//Modifying sequence operations
+    template <class InputIt, class OutputIt>
+    OutputIt copy ( InputIt first, InputIt last, OutputIt d_first) {
+        for (; first != last; ++first, ++d_first){
+             *d_first = *first;
+       }
+        return d_first;
+    }
+    
+    template < class InputIt, class OutputIt, class UnaryPredicate>
+    OutputIt copy_if( InputIt first, InputIt last, OutputIt d_first,
+                    UnaryPredicate pred) {
+        for(; first != last; ++first) {
+            if(pred(*first)){
+                *d_first = *first;
+                ++d_first;
+            }
+        }
+        return d_first;
+    }
+    
+    template <class InputIt, class Size, class OutputIt>
+    OutputIt copy_n (InputIt first, Size count, OutputIt result) {
+        for(; count > 0; --count, ++first, ++result){
+            *result = *first;
+        }
+        return result;
+    }
+    
+    template <class BidirIt1, class BidirIt2>
+    BidirIt2 copy_backward (BidirIt1 first, BidirIt1 last, 
+                            BidirIt2 d_last) {
+        for(; first != last; ) {
+            *--d_last = *(--last);
+        }
+        return d_last;
+    }
+    
+    template <class InputIt, class OutputIt>
+    OutputIt move ( InputIt first, InputIt last, OutputIt d_first) {
+        for (; first != last; ++first)
+            *d_first++ = std::move(*first);
+        return d_first;
+    }
+    
+    template <class BidirIt1, class BidirIt2>
+    BidirIt2 move_backward ( BidirIt1 first, BidirIt1 last, BidirIt2 d_last) {
+        for (; first != last; ) {
+            *(--d_last) = std::move(*--last);
+        }
+        return d_last;
+    }
+    
+    template <class ForwardIt, class T>
+    void fill ( ForwardIt first, ForwardIt last, const T& value) {
+        for(; first != last; ++first) {
+            *first = value;
+        }
+    }
+    
+    template <class OutputIt, class Size, class T>
+    void fill_n ( OutputIt first, Size count, const T& value) {
+        for (; count > 0; ++first, --count) {
+            *first = value;
+        }
+    }
+    /*
+    template <class OutputIt, class Size, class T>
+    OutputIt fill_n ( OutputIt first, Size count, const T& value) {
+        for (; count > 0; ++first, --count) {
+            *first = value;
+        }
+        return first;
+    }
+    */
+    
+    template <class InputIt, class OutputIt, class UnaryOperation>
+    OutputIt transform ( InputIt first1, InputIt last1, OutputIt d_first,
+                       UnaryOperation unary_op) {
+        for(; first1 != last1; ++first1) {
+            *d_first = unary_op(*first1);
+            ++d_first;
+        }
+        return d_first;
+    }
+    
+    template <class InputIt1, class InputIt2, class OutputIt, class BinaryOperation>
+    OutputIt transform ( InputIt1 first1, InputIt1 last1, InputIt2 first2,
+                       OutputIt d_first, BinaryOperation binary_op) {
+        for(; first1 != last1; ++first1, ++first2) {
+            *d_first = binary_op(*first1, *first2);
+            ++d_first;
+        }
+        return d_first;
+    }
+    
+    template <class ForwardIt, class Generator>
+    void generate ( ForwardIt first, ForwardIt last, Generator g) {
+        for (; first != last; ++first) {
+            *first = g();
+        }
+    }
+    
+    template <class OutputIt, class Size, class Generator>
+    OutputIt generate_n (OutputIt first, Size count, Generator g) {
+        for(; count > 0; --count, ++first) {
+            *first = g();
+        }
+        return first;
+    }
+    
+    template <class InputIt, class OutputIt, class T>
+    OutputIt remove_copy ( InputIt first, InputIt last, OutputIt d_first,
+                         const T& value) {
+        for (; first != last; ++first) {
+            if ( *first != value) {
+                *d_first = *first;
+                ++d_first;
+            }
+        }
+        return d_first;
+    }
+    
+    template <class InputIt, class OutputIt, class UnaryPredicate>
+    OutputIt remove_copy_if (InputIt first, InputIt last, OutputIt d_first,
+                            UnaryPredicate p) {
+        for (; first != last; ++first) {
+            if (!p(*first)){
+                *d_first = *first;
+                ++d_first;
+            }
+        }
+        return d_first;
+        
+    }
+    
+    template <class T>
+    void swap (T& a, T& b){
+        T temp = a;
+        a = b;
+        b = temp;
+    }
+        
 } // namespace F
+//TODO : remove, remove_if
+
 
 
 
@@ -573,11 +721,107 @@ namespace test {
     
 }
 
+
+
+
 int main() {
-    test::test_all_of();
-    test::test_none_of();
-    test::test_any_of();
+  //  test::test_all_of();
+  //  test::test_none_of();
+  //  test::test_any_of();
     
-    test::test_search_n();
+  //  test::test_search_n();
+    
+    
+    
+    std::vector<int> A = {0,1,2,3,4,5,6};
+    std::vector<int> B;
+    F::copy(A.begin(), A.end(), std::back_inserter(B));
+    
+    F::copy(A.begin(), A.end(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << std::endl;
+    
+    std::string in = "1234567890";
+    std::string out;
+    F::copy_n(in.begin(), 4, std::back_inserter(out));
+    std::cout << out << std::endl;
+    
+    std::vector<int> C(15);
+    F::copy_backward(A.begin(), A.end(), C.end());
+    for ( auto x : C)
+        std::cout << x << std::endl;
+    
+    
+    std::vector<int> v1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+ 
+    F::fill_n(v1.begin(), 5, -1);
+ 
+    std::copy(begin(v1), end(v1), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << "\n";
+    
+    std::string s("hello");
+    F::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+    std::cout << s << std::endl;
+    
+    std::vector<int> v(5);
+    int n = {0};
+    F::generate_n(v.begin(), 3, [&n]{ return n++; });
+ 
+    std::cout << "v: ";
+    for (auto iv: v) {
+        std::cout << iv << " ";
+    }
+    
+    std::string str = "Text with some   spaces";
+    std::cout << "before: " << str << "\n";
+ 
+    std::cout << "after:  ";
+    F::remove_copy(str.begin(), str.end(),
+                     std::ostream_iterator<char>(std::cout), ' ');
+    std::cout << '\n';
+
+    int a = 5, b = 3;
+
+    // before
+    std::cout << a << ' ' << b << '\n';
+
+    F::swap(a,b);
+
+    // after
+    std::cout << a << ' ' << b << '\n';
+
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
