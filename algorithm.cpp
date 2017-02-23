@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <list>
 
 namespace F{
 //Non-modifying sequence operations
@@ -437,9 +438,51 @@ template < class InputIt, class UnaryPredicate>
         a = b;
         b = temp;
     }
+    
+    template <class ForwardIt1, class ForwardIt2>
+    ForwardIt2 swap_ranges ( ForwardIt1 first1, ForwardIt1 last1, ForwardIt2 first2) {
+        for(; first1 != last1; ++first1) {
+            auto temp = *first1;
+            *first1 = *first2;
+            *first2 = temp;
+            ++first2;
+        }
+        return first2;
+    }
+    
+    template <class ForwardIt1, class ForwardIt2>
+    void iter_swap(ForwardIt1 a, ForwardIt2 b) {
+        auto temp = *a;
+        *a = *b;
+        *b = temp;
+    }
+    
+    template <class BidirIt>
+    void reverse ( BidirIt first, BidirIt last) {
+        for (auto i = 0; i < (last - first)/2; ++i) {
+            auto temp = *(first + i);
+            *(first + i) = *((last - i) - 1);
+            *((last - i) - 1) = temp;
+        }
+    }
+    
+    template <class BidirIt, class OutputIt>
+    OutputIt reverse_copy(BidirIt first, BidirIt last, OutputIt d_first) {
+        for(last -= 1; last >= first; --last) {
+            *d_first = *last;
+            ++d_first;
+        }
+        return d_first;
+    }
+    
+    //template <class ForwardIt>
+    //ForwardIt rotate( ForwardIt first, ForwardIt n_First, ForwardIt last) {
+        
+        
+   // }
         
 } // namespace F
-//TODO : remove, remove_if
+//TODO : remove, remove_if swap_ranges(auto?) 
 
 
 
@@ -789,31 +832,39 @@ int main() {
 
     // after
     std::cout << a << ' ' << b << '\n';
+    
+     std::vector<int> t = {1, 2, 3, 4, 5};
+    std::list<int> l = {-1, -2, -3, -4, -5};
+ 
+    F::swap_ranges(t.begin(), t.begin()+3, l.begin());
+ 
+    for(int n : t)
+       std::cout << n << ' ';
+    std::cout << '\n';
+    for(int n : l)
+       std::cout << n << ' ';
+    std::cout << '\n';
+    
+    
+    int q[] = {4, 5, 6, 7};
+    F::reverse(std::begin(q), std::end(q));
+    std::cout << q[0] << q[1] << q[2] << q[3] << '\n';
+    
+    std::vector<int> w({1,2,3});
+    for (const auto& value : w) {
+        std::cout << value << " ";
+    }
+    std::cout << '\n';
+ 
+    std::vector<int> destination(3);
+    F::reverse_copy(std::begin(w), std::end(w), std::begin(destination));
+    for (const auto& value : destination) {
+        std::cout << value << " ";
+    }
+    std::cout << '\n';
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
